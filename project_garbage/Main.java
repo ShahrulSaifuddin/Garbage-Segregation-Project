@@ -37,14 +37,20 @@ import org.nd4j.linalg.api.buffer.DataType;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.learning.config.AdaGrad;
 import org.nd4j.linalg.learning.config.Adam;
+import org.nd4j.linalg.learning.config.Nesterovs;
+import org.nd4j.linalg.learning.config.RmsProp;
+import org.nd4j.linalg.schedule.ISchedule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.bytedeco.opencv.global.opencv_core.CV_8U;
 import static org.bytedeco.opencv.global.opencv_core.flip;
@@ -65,7 +71,7 @@ public class Main {
     private static double[][] priorBoxes = {{1, 3}, {2.5, 6}, {3, 4}, {3.5, 8}, {4, 9}};
 
     private static int batchSize = 16;
-    private static int nEpochs = 40;
+    private static int nEpochs = 7;
     private static double learningRate = 1e-4;
     private static int nClasses = 5;
     private static List<String> labels;
@@ -82,6 +88,7 @@ public class Main {
     private static String labeltext = null;
 
     public static void main(String[] args) throws Exception {
+
         //        STEP 1 : Create iterators
         Iterator.setup();
         RecordReaderDataSetIterator trainIter = Iterator.trainIterator(batchSize);
@@ -172,6 +179,7 @@ public class Main {
                 .gradientNormalization(GradientNormalization.RenormalizeL2PerLayer)
                 .gradientNormalizationThreshold(1.0)
                 .updater(new Adam.Builder().learningRate(learningRate).build())
+//                .updater(new Nesterovs(learningRate, 0.9))
                 .l2(0.00001)
                 .activation(Activation.IDENTITY)
                 .trainingWorkspaceMode(WorkspaceMode.ENABLED)
